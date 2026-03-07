@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authorize Project</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .card {
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            text-align: center;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .input-group input {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.875rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        }
+
+        .btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.875rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+        }
+
+        .btn.loading .spinner {
+            display: block;
+        }
+
+        .btn.loading .btn-text {
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Data Display */
+        .data-grid {
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .data-value {
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        /* Code Block */
+        .code-block {
+            position: relative;
+            background: #0f172a;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-lang {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: color 0.2s;
+        }
+
+        .copy-btn:hover {
+            color: var(--text-main);
+        }
+
+        .code-content {
+            padding: 1.25rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            color: #a5b4fc;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .success-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="card">
+
+            <!-- Step 1: Input -->
+            <div id="step-input" class="step active">
+                <h1>Link your App</h1>
+                <p class="subtitle">You have been redirected successfully. Please enter your project key to establish
+                    connection.</p>
+
+                <form id="verify-form">
+                    <div class="input-group">
+                        <label for="project-key">Project Key</label>
+                        <input type="text" id="project-key" placeholder="e.g. prj_xyz123abc" autocomplete="off">
+                        <div id="error-msg" class="error-message"></div>
+                    </div>
+
+                    <button type="submit" class="btn" id="submit-btn">
+                        <span class="btn-text">Verify & Connect</span>
+                        <div class="spinner"></div>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Step 2: Details (Verified) -->
+            <div id="step-verified" class="step">
+                <div class="success-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <h1>Verification Successful</h1>
+                <p class="subtitle">Your project connection has been verified. Here are the details retrieved from your
+                    cloud environment.</p>
+
+                <div class="data-grid" id="data-container">
+                    <!-- Populated by JS -->
+                </div>
+
+                <button class="btn" id="continue-btn">Continue to Integration</button>
+            </div>
+
+            <!-- Step 3: Script & Instructions -->
+            <div id="step-instructions" class="step">
+                <h1>Final Step: Integration</h1>
+                <p class="subtitle">Copy the snippet below and paste it just before the closing
+                    <code>&lt;/head&gt;</code> tag of your website.</p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <div class="code-lang">HTML</div>
+                        <button class="copy-btn" id="copy-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            <span id="copy-text">Copy</span>
+                        </button>
+                    </div>
+                    <div class="code-content" id="script-content">
+                        &lt;script src="https://cdn.example.com/widget.js" data-project-key="REPLACE_ME"
+                        defer&gt;&lt;/script&gt;
+                    </div>
+                </div>
+
+                <button class="btn" onclick="window.location.reload()">Finish</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('verify-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const projectKeyInput = document.getElementById('project-key');
+        const errorMsg = document.getElementById('error-msg');
+
+        const stepInput = document.getElementById('step-input');
+        const stepVerified = document.getElementById('step-verified');
+        const stepInstructions = document.getElementById('step-instructions');
+
+        const continueBtn = document.getElementById('continue-btn');
+        const dataContainer = document.getElementById('data-container');
+
+        const copyBtn = document.getElementById('copy-btn');
+        const copyText = document.getElementById('copy-text');
+        const scriptContentElem = document.getElementById('script-content');
+
+        let currentProjectKey = '';
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const key = projectKeyInput.value.trim();
+            if (!key) {
+                showError('Please enter a project key.');
+                return;
+            }
+
+            // Reset UI
+            hideError();
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ project_key: key })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || result.status === 'error') {
+                    showError(result.message || 'An error occurred during verification.');
+                } else {
+                    // Success
+                    currentProjectKey = key;
+                    populateData(result.data);
+
+                    // Proceed to next step
+                    stepInput.classList.remove('active');
+                    stepVerified.classList.add('active');
+                }
+            } catch (err) {
+                showError('Failed to connect to the server. Please try again.');
+            } finally {
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }
+        });
+
+        continueBtn.addEventListener('click', () => {
+            stepVerified.classList.remove('active');
+            stepInstructions.classList.add('active');
+
+            // Update the script content with the actual key
+            const templateScript = `&lt;script src="https://cdn.example.com/widget.js" data-project-key="${currentProjectKey}" defer&gt;&lt;/script&gt;`;
+            scriptContentElem.innerHTML = templateScript;
+        });
+
+        copyBtn.addEventListener('click', () => {
+            // Getting unescaped text content
+            const textToCopy = scriptContentElem.textContent.trim();
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                copyText.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyText.textContent = 'Copy';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        });
+
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorMsg.style.display = 'block';
+            projectKeyInput.style.borderColor = 'var(--danger)';
+        }
+
+        function hideError() {
+            errorMsg.style.display = 'none';
+            projectKeyInput.style.borderColor = '';
+        }
+
+        function populateData(data) {
+            dataContainer.innerHTML = '';
+            for (const [key, value] of Object.entries(data)) {
+                const formattedKey = key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ');
+                const row = document.createElement('div');
+                row.className = 'data-row';
+                row.innerHTML = `
+                    <span class="data-label">${formattedKey}</span>
+                    <span class="data-value">${value}</span>
+                `;
+                dataContainer.appendChild(row);
+            }
+        }
+    </script>
+</body>
+
+</html>
