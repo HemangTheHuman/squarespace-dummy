@@ -380,6 +380,24 @@
                         </div>
                     </div>
                 </div>
+                <div id="multilipi-script-container" style="display: none; margin-top: 2rem;">
+                    <p class="subtitle" style="text-align: left; margin-bottom: 0.5rem;">Copy the snippet below and paste it just before the closing <code>&lt;/head&gt;</code> tag of your website.</p>
+                    <div class="code-block" style="margin: 0.5rem 0;">
+                        <div class="code-header">
+                            <div class="code-lang">HTML</div>
+                            <button class="copy-btn" id="copy-btn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                <span id="copy-text">Copy</span>
+                            </button>
+                        </div>
+                        <div class="code-content" id="script-content"></div>
+                    </div>
+                </div>
+                
                 <div id="multilipi-error" class="error-message" style="margin-top: 1rem; text-align: center;"></div>
             </div>
         </div>
@@ -397,53 +415,6 @@
                 </button>
             </div>
 
-            <!-- Step 2: Details (Verified) -->
-            <div id="step-verified" class="step">
-                <div class="success-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                </div>
-                <h1>Verification Successful</h1>
-                <p class="subtitle">Your project connection has been verified. Here are the details retrieved from your
-                    cloud environment.</p>
-
-                <div class="data-grid" id="data-container">
-                    <!-- Populated by JS -->
-                </div>
-
-                <button class="btn" id="continue-btn">Continue to Integration</button>
-            </div>
-
-            <!-- Step 3: Script & Instructions -->
-            <div id="step-instructions" class="step">
-                <h1>Final Step: Integration</h1>
-                <p class="subtitle">Copy the snippet below and paste it just before the closing
-                    <code>&lt;/head&gt;</code> tag of your website.
-                </p>
-
-                <div class="code-block">
-                    <div class="code-header">
-                        <div class="code-lang">HTML</div>
-                        <button class="copy-btn" id="copy-btn">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                            </svg>
-                            <span id="copy-text">Copy</span>
-                        </button>
-                    </div>
-                    <div class="code-content" id="script-content">
-                        &lt;script src="https://cdn.example.com/widget.js" data-project-key="REPLACE_ME"
-                        defer&gt;&lt;/script&gt;
-                    </div>
-                </div>
-
-                <button class="btn" onclick="window.location.reload()">Finish</button>
-            </div>
-
         </div>
         {% endif %}
     </div>
@@ -456,6 +427,10 @@
         const sourceLangEl = document.getElementById('source-lang');
         const targetLangsEl = document.getElementById('target-langs');
         const multilipiError = document.getElementById('multilipi-error');
+        const scriptContainer = document.getElementById('multilipi-script-container');
+        const scriptContentElem = document.getElementById('script-content');
+        const copyBtn = document.getElementById('copy-btn');
+        const copyText = document.getElementById('copy-text');
 
         connectBtn.addEventListener('click', async () => {
             const key = multilipiKeyInput.value.trim();
@@ -464,6 +439,7 @@
             connectBtn.classList.add('loading');
             connectBtn.disabled = true;
             resultDiv.style.display = 'none';
+            scriptContainer.style.display = 'none';
             multilipiError.style.display = 'none';
 
             const originUrl = '{{ website_info.url }}';
@@ -498,6 +474,10 @@
 
                     targetLangsEl.textContent = targets;
                     resultDiv.style.display = 'block';
+                    
+                    // Display the script snippet
+                    scriptContentElem.textContent = `<script src="https://script-cdn.multilipi.com/static/JS/page_translations.js" multilipi-key="${key}" mode="auto" data-pos-x="50" data-pos-y="50" crossorigin="anonymous" defer></script>`;
+                    scriptContainer.style.display = 'block';
                 }
             } catch (err) {
                 multilipiError.textContent = 'Failed to connect to Multilipi API.';
@@ -506,6 +486,18 @@
                 connectBtn.classList.remove('loading');
                 connectBtn.disabled = false;
             }
+        });
+        
+        copyBtn.addEventListener('click', () => {
+            const textToCopy = scriptContentElem.textContent.trim();
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                copyText.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyText.textContent = 'Copy';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
         });
         {% else %}
         const form = document.getElementById('verify-form');
@@ -599,20 +591,6 @@
         function hideError() {
             errorMsg.style.display = 'none';
             projectKeyInput.style.borderColor = '';
-        }
-
-        function populateData(data) {
-            dataContainer.innerHTML = '';
-            for (const [key, value] of Object.entries(data)) {
-                const formattedKey = key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ');
-                const row = document.createElement('div');
-                row.className = 'data-row';
-                row.innerHTML = `
-                    <span class="data-label">${formattedKey}</span>
-                    <span class="data-value">${value}</span>
-                `;
-                dataContainer.appendChild(row);
-            }
         }
         {% endif %}
     </script>
