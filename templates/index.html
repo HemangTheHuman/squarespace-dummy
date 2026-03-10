@@ -387,30 +387,32 @@
                         </div>
                     </div>
                 </div>
-                <div id="multilipi-script-container" style="display: none; margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
-                    <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: #10b981;">Step 2: Add Script to Squarespace</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.5;">
-                        From your Squarespace configuration dashboard: <br/>go to <strong>Edit Pages</strong> → open <strong>Custom Code</strong> (in the left sidebar) → click on <strong>Code Injection</strong>, and paste the script below into the <strong>Header</strong> section.
-                    </p>
-                    <div class="code-block" style="margin: 0.5rem 0;">
-                        <div class="code-header">
-                            <div class="code-lang">HTML</div>
-                            <button class="copy-btn" id="copy-btn">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                </svg>
-                                <span id="copy-text">Copy</span>
-                            </button>
-                        </div>
-                        <div class="code-content" id="script-content"></div>
-                    </div>
-                </div>
-                
                 <div id="multilipi-error" class="error-message" style="margin-top: 1rem; text-align: center;"></div>
             </div>
         </div>
+
+        <!-- NEW Step 2 Card -->
+        <div id="multilipi-script-container" class="card" style="display: none; margin-top: 2rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; color: #10b981;">Step 2: Add Script to Squarespace</h3>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.5;">
+                From your Squarespace configuration dashboard: <br/>go to <strong>Edit Pages</strong> → open <strong>Custom Code</strong> (in the left sidebar) → click on <strong>Code Injection</strong>, and paste the script below into the <strong>Header</strong> section.
+            </p>
+            <div class="code-block" style="margin: 0;">
+                <div class="code-header">
+                    <div class="code-lang">HTML</div>
+                    <button class="copy-btn" id="copy-btn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span id="copy-text">Copy</span>
+                    </button>
+                </div>
+                <div class="code-content" id="script-content"></div>
+            </div>
+        </div>
+
         {% else %}
         <div class="card">
             <!-- Step 1: Input -->
@@ -488,6 +490,21 @@
                     // Display the script snippet
                     scriptContentElem.textContent = `<script src="https://script-cdn.multilipi.com/static/JS/page_translations.js" multilipi-key="${key}" mode="auto" data-pos-x="50" data-pos-y="50" crossorigin="anonymous" defer><\/script>`;
                     scriptContainer.style.display = 'block';
+
+                    // Lock input and hide button
+                    multilipiKeyInput.readOnly = true;
+                    multilipiKeyInput.style.cursor = 'copy';
+                    multilipiKeyInput.title = 'Click to copy key';
+                    multilipiKeyInput.addEventListener('click', function copyKey() {
+                        if (this.readOnly) {
+                            navigator.clipboard.writeText(this.value).then(() => {
+                                const originalBorder = this.style.borderColor;
+                                this.style.borderColor = 'var(--success)';
+                                setTimeout(() => this.style.borderColor = originalBorder, 1000);
+                            });
+                        }
+                    });
+                    connectBtn.style.display = 'none';
                 }
             } catch (err) {
                 multilipiError.textContent = 'Failed to connect to Multilipi API.';
