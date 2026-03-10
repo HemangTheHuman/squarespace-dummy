@@ -288,11 +288,53 @@
     <div class="container">
         <div class="card">
 
+            {% if website_info %}
+            <div id="step-squarespace" class="step active">
+                <div class="success-icon" style="margin-bottom: 1rem;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <h1>Squarespace Connected</h1>
+                <p class="subtitle">Your application is successfully linked with Squarespace.</p>
+
+                <div class="data-grid">
+                    <div class="data-row">
+                        <span class="data-label">Website Title</span>
+                        <span class="data-value">{{ website_info.title }}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">URL</span>
+                        <span class="data-value"><a href="{{ website_info.url }}" target="_blank" style="color:var(--primary); text-decoration:none;">{{ website_info.url }}</a></span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Site ID</span>
+                        <span class="data-value">{{ website_info.siteId }}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Currency</span>
+                        <span class="data-value">{{ website_info.currency }}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Time Zone</span>
+                        <span class="data-value">{{ website_info.timeZone }}</span>
+                    </div>
+                    {% if website_info.location %}
+                    <div class="data-row">
+                        <span class="data-label">Location</span>
+                        <span class="data-value">{{ website_info.location.region }}, {{ website_info.location.country }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <button class="btn" onclick="window.location.href='/'">Return Home</button>
+            </div>
+            {% else %}
             <!-- Step 1: Input -->
             <div id="step-input" class="step active">
                 <h1>Link your App</h1>
-                <p class="subtitle">You have been redirected successfully. Please enter your project key to establish
-                    connection.</p>
+                <p class="subtitle">Please enter your project key to establish connection or link with Squarespace directly.</p>
 
                 <form id="verify-form">
                     <div class="input-group">
@@ -301,12 +343,22 @@
                         <div id="error-msg" class="error-message"></div>
                     </div>
 
-                    <button type="submit" class="btn" id="submit-btn">
+                    <button type="submit" class="btn" id="submit-btn" style="margin-bottom: 1rem;">
                         <span class="btn-text">Verify & Connect</span>
                         <div class="spinner"></div>
                     </button>
                 </form>
+                
+                <div style="text-align: center; margin: 1.5rem 0; position: relative;">
+                    <hr style="border-color: var(--border-color); opacity: 0.5;">
+                    <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--surface-color); padding: 0 10px; font-size: 0.8rem; color: var(--text-muted);">OR</span>
+                </div>
+                
+                <button class="btn" onclick="window.location.href='/login/squarespace'" style="background: transparent; border: 1px solid var(--text-muted); color: var(--text-main);">
+                    Connect with Squarespace
+                </button>
             </div>
+            {% endif %}
 
             <!-- Step 2: Details (Verified) -->
             <div id="step-verified" class="step">
