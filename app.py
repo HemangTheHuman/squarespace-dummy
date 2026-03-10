@@ -55,26 +55,11 @@ def index():
             response.raise_for_status()
             token_data = response.json()
             
-            # Extract the new access token
-            access_token = token_data.get('access_token')
+            # Save token to session for further calls
+            session['access_token'] = token_data.get('access_token')
             
-            # Query the Squarespace Authorization API to get website details
-            website_url = "https://api.squarespace.com/1.0/authorization/website"
-            website_headers = {
-                'Authorization': f"Bearer {access_token}",
-                'User-Agent': 'SquarespaceDemoApp/1.0',
-                'Content-Type': 'application/json'
-            }
-            
-            website_response = requests.get(website_url, headers=website_headers)
-            website_response.raise_for_status()
-            website_info = website_response.json()
-            
-            # Save token to session if needed for further calls
-            session['access_token'] = access_token
-            
-            # Render the landing page with the website info
-            return render_template('index.html', website_info=website_info)
+            # Redirect to home to load normally
+            return redirect('/')
             
         except requests.exceptions.RequestException as e:
             # Handle potential None type for response if the request completely fails
@@ -90,7 +75,26 @@ def index():
                 'details': error_details
             }), 400
 
-    return render_template('index.html')
+    # Normal load: verify if we have access token
+    access_token = session.get('access_token')
+    website_info = None
+
+    if access_token:
+        website_url = "https://api.squarespace.com/1.0/authorization/website"
+        website_headers = {
+            'Authorization': f"Bearer {access_token}",
+            'User-Agent': 'SquarespaceDemoApp/1.0',
+            'Content-Type': 'application/json'
+        }
+        
+        try:
+            website_response = requests.get(website_url, headers=website_headers)
+            website_response.raise_for_status()
+            website_info = website_response.json()
+        except requests.exceptions.RequestException as e:
+            session.pop('access_token', None)
+
+    return render_template('index.html', website_info=website_info)
 
 @app.route('/api/verify', methods=['POST'])
 def verify_project_key():
