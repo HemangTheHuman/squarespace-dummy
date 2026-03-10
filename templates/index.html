@@ -355,8 +355,15 @@
             <!-- Multilipi Box -->
             <div class="card">
                 <h1 style="text-align: left;">Connect Multilipi</h1>
-                <p class="subtitle" style="text-align: left; margin-bottom: 1.5rem;">Enter your Multilipi key to verify
-                    and fetch available languages.</p>
+                <p class="subtitle" style="text-align: left; margin-bottom: 2rem;">Complete the setup by tracking the steps below.</p>
+                
+                <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: #e2e8f0;">Step 1: Get Your Project Key</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.5;">
+                    Visit the Multilipi dashboard and create a new project for this website. Follow the onboarding steps to reveal your key, or locate it within the Setup page of an existing project.
+                </p>
+                <button class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-main); margin-bottom: 1.5rem; font-size: 0.85rem;" onclick="window.open('https://dashboard.multilipi.com', '_blank')">
+                    Open Multilipi Dashboard
+                </button>
 
                 <div class="input-group">
                     <label for="multilipi-key">Multilipi Key</label>
@@ -380,8 +387,11 @@
                         </div>
                     </div>
                 </div>
-                <div id="multilipi-script-container" style="display: none; margin-top: 2rem;">
-                    <p class="subtitle" style="text-align: left; margin-bottom: 0.5rem;">Copy the snippet below and paste it just before the closing <code>&lt;/head&gt;</code> tag of your website.</p>
+                <div id="multilipi-script-container" style="display: none; margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+                    <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: #10b981;">Step 2: Add Script to Squarespace</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.5;">
+                        From your Squarespace configuration dashboard: <br/>go to <strong>Edit Pages</strong> → open <strong>Custom Code</strong> (in the left sidebar) → click on <strong>Code Injection</strong>, and paste the script below into the <strong>Header</strong> section.
+                    </p>
                     <div class="code-block" style="margin: 0.5rem 0;">
                         <div class="code-header">
                             <div class="code-lang">HTML</div>
